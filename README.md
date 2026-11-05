@@ -43,3 +43,11 @@ A fast, free character creator and sheet manager for the Multiverse d616 tableto
 
 * **Email:** alemario2106@gmail.com
 * Feedback, bug reports, and suggestions are always welcome!
+
+---
+
+## ⚖️ Legal Disclaimer
+
+* **Multiverse Hero Creator** is an unofficial, non-commercial fan-made companion tool for tabletop role-playing games.
+* This project is not affiliated with, endorsed, sponsored, or specifically approved by Marvel, Disney, or any related entity. All product names, logos, and brands are property of their respective owners.
+

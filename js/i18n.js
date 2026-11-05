@@ -121,7 +121,7 @@ const MMRPG_I18N = {
             btn_delete_hero_item_title: "Diesen Helden löschen",
             opt_pick_preset: "Vorgaben",
             footer_contact: "✉️ Kontakt:",
-            welcome_lang_title: "🌐 Sprache wählen / Choose Language",
+            welcome_lang_title: "🌐 Sprache wählen",
             welcome_lang_desc: "Wähle deine bevorzugte Sprache für den Editor, die Regeln und die Bogen-Vorschau.",
             btn_open_lang_selector: "Sprachauswahl öffnen",
 
@@ -396,7 +396,7 @@ const MMRPG_I18N = {
             btn_delete_hero_item_title: "Delete this hero",
             opt_pick_preset: "Presets",
             footer_contact: "✉️ Contact:",
-            welcome_lang_title: "🌐 Choose Language / Sprache wählen",
+            welcome_lang_title: "🌐 Choose Language",
             welcome_lang_desc: "Choose your preferred language for the editor, rules, and sheet preview.",
             btn_open_lang_selector: "Open language picker",
 
@@ -671,7 +671,7 @@ const MMRPG_I18N = {
             btn_delete_hero_item_title: "Eliminar este héroe",
             opt_pick_preset: "Opciones",
             footer_contact: "✉️ Contacto:",
-            welcome_lang_title: "🌐 Elige tu idioma / Choose Language",
+            welcome_lang_title: "🌐 Elige tu idioma",
             welcome_lang_desc: "Elige tu idioma preferido para el editor, las reglas y la vista previa de la hoja.",
             btn_open_lang_selector: "Abrir selector de idioma",
 
@@ -946,7 +946,7 @@ const MMRPG_I18N = {
             btn_delete_hero_item_title: "Elimina questo eroe",
             opt_pick_preset: "Opzioni",
             footer_contact: "✉️ Contatto:",
-            welcome_lang_title: "🌐 Scegli la lingua / Choose Language",
+            welcome_lang_title: "🌐 Scegli la lingua",
             welcome_lang_desc: "Scegli la tua lingua preferita per l'editor, le regole e l'anteprima della scheda.",
             btn_open_lang_selector: "Apri selettore lingua",
 
@@ -1221,7 +1221,7 @@ const MMRPG_I18N = {
             btn_delete_hero_item_title: "Supprimer ce héros",
             opt_pick_preset: "Choix",
             footer_contact: "✉️ Contact :",
-            welcome_lang_title: "🌐 Choisissez la langue / Choose Language",
+            welcome_lang_title: "🌐 Choisissez la langue",
             welcome_lang_desc: "Choisissez votre langue préférée pour l'éditeur, les règles et l'aperçu de la feuille.",
             btn_open_lang_selector: "Ouvrir le sélecteur de langue",
 
@@ -1424,12 +1424,29 @@ const MMRPG_I18N = {
         } catch (e) {}
 
         if (!saved || !this.translations[saved]) {
-            const nav = (navigator.language || navigator.userLanguage || '').toLowerCase();
-            if (nav.startsWith('es')) saved = 'es';
-            else if (nav.startsWith('it')) saved = 'it';
-            else if (nav.startsWith('fr')) saved = 'fr';
-            else if (nav.startsWith('en')) saved = 'en';
-            else saved = 'de';
+            const getBrowserLang = () => {
+                const candidates = [];
+                if (navigator.languages && navigator.languages.length) {
+                    for (let i = 0; i < navigator.languages.length; i++) {
+                        candidates.push(navigator.languages[i]);
+                    }
+                }
+                if (navigator.language) candidates.push(navigator.language);
+                if (navigator.userLanguage) candidates.push(navigator.userLanguage);
+
+                for (let i = 0; i < candidates.length; i++) {
+                    const l = (candidates[i] || '').toLowerCase().trim();
+                    if (l.startsWith('de')) return 'de';
+                    if (l.startsWith('es')) return 'es';
+                    if (l.startsWith('it')) return 'it';
+                    if (l.startsWith('fr')) return 'fr';
+                    if (l.startsWith('en')) return 'en';
+                }
+                // Fallback für alle anderen Sprachen (z. B. Arabisch, Japanisch, etc.)
+                return 'en';
+            };
+
+            saved = getBrowserLang();
         }
 
         this.currentLang = saved;
