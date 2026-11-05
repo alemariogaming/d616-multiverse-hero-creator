@@ -1,0 +1,828 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multiverse Hero Creator – RPG Character Sheet Companion</title>
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/print.css">
+</head>
+<body>
+
+    <!-- =======================================================================
+         Kopfzeile & Schnellauswahl
+         ======================================================================= -->
+    <header class="app-header">
+        <div class="header-container">
+            <div class="logo-group">
+                <span class="app-badge">d616</span>
+                <div>
+                    <h1 class="app-title" data-i18n="app_title">MULTIVERSE HERO CREATOR</h1>
+                </div>
+            </div>
+
+            <!-- Werkzeugleiste: Sauber gruppiert in der Mitte -->
+            <div class="header-actions">
+                <!-- Gruppe 1: Helden-Verwaltung & Datei -->
+                <div class="header-btn-group" title="Helden-Verwaltung und Datei-Sicherung">
+                    <select id="preset-select" class="header-select" title="Charakter wählen oder neues Blatt anlegen">
+                        <option value="" data-i18n="preset_default">★ Helden-Verwaltung...</option>
+                        <option value="blank" data-i18n="preset_blank">+ Neues leeres Blatt (Rank 1)</option>
+                    </select>
+
+                    <button id="btn-delete-hero" class="btn btn-secondary btn-sm" title="Ausgewählten Helden löschen" style="display: none;" data-i18n-title="btn_delete_hero_title">
+                        <span style="color: #ef4444; font-weight: 800; font-size: 0.85rem;">✕</span>
+                    </button>
+
+                    <button id="btn-import-json" class="btn btn-secondary btn-sm" title="Charakterdatei öffnen (.json)">
+                        <span data-i18n="btn_open">📂 Öffnen</span>
+                    </button>
+                    <input type="file" id="file-input" accept=".json" style="display: none;">
+
+                    <button id="btn-export-json" class="btn btn-secondary btn-sm" title="Charakter im Browser sichern & als .json Datei speichern">
+                        <span data-i18n="btn_save">💾 Speichern</span>
+                    </button>
+                </div>
+
+                <div class="header-divider" aria-hidden="true"></div>
+
+                <!-- Gruppe 2: Drucken -->
+                <div class="header-btn-group" title="Drucken und PDF-Export">
+                    <button id="btn-print" class="btn btn-secondary btn-sm header-btn-print" title="Als DIN A4 Bogen drucken oder als PDF exportieren">
+                        <span data-i18n="btn_print">🖨️ Drucken / PDF</span>
+                    </button>
+                </div>
+
+                <div class="header-divider" aria-hidden="true"></div>
+
+                <!-- Gruppe 3: Regeln, Leeren & Einstellungen -->
+                <div class="header-btn-group" title="Regeln & Einstellungen">
+                    <label class="header-rule-toggle" title="Offizielle Regeln befolgen (Punktebudget, Limits & Caps)">
+                        <input type="checkbox" id="toggle-rule-compliance" checked>
+                        <span data-i18n="rule_compliance">Regeln befolgen</span>
+                    </label>
+
+                    <button id="btn-reset-sheet" class="btn btn-secondary btn-sm btn-header-reset" title="Aktuellen Bogen leeren">
+                        <span data-i18n="btn_reset">🗑️ Blatt leeren</span>
+                    </button>
+
+                    <button id="btn-settings-open" class="btn btn-secondary btn-sm header-btn-settings" title="Einstellungen">
+                        <span>⚙️</span> <span data-i18n="btn_settings">Einstellungen</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Ansicht Umschalter (Rechte Seite) -->
+            <div class="nav-tabs" role="tablist" aria-label="Ansichtsmodus">
+                <button id="tab-editor" class="nav-tab-btn active" role="tab" title="Zurück zum Editor" data-i18n="nav_editor">
+                    ✏️ Editor
+                </button>
+                <button id="tab-preview" class="nav-tab-btn" role="tab" title="Druckfertigen DIN A4 Bogen ansehen" data-i18n="nav_preview">
+                    📄 Bogen-Vorschau
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- =======================================================================
+         Hauptinhalt: Charakter-Editor
+         ======================================================================= -->
+    <main class="main-content">
+
+        <!-- Oberes Profil & Kernwerte (Rank, Karma, Health, Focus, Initiative) -->
+        <div class="profile-stat-bar">
+            <!-- Rank -->
+            <div class="stat-metric-card">
+                <div class="stat-metric-label" data-i18n="stat_rank">Rang</div>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <select id="char-rank" class="form-select" style="font-size: 1.2rem; font-weight: 900; width: 100%;">
+                        <option value="1">Rank 1: Rookie</option>
+                        <option value="2">Rank 2: Local Hero</option>
+                        <option value="3">Rank 3: Champion</option>
+                        <option value="4">Rank 4: Legend</option>
+                        <option value="5">Rank 5: Mythic</option>
+                        <option value="6">Rank 6: Cosmic</option>
+                    </select>
+                </div>
+                <div id="rank-limits-display" class="stat-metric-sub">Max. Attribut: 7 | Max. Powers: 16</div>
+            </div>
+
+            <!-- Karma -->
+            <div class="stat-metric-card">
+                <div class="stat-metric-label" data-i18n="stat_karma">Karma</div>
+                <input type="number" id="char-karma" class="form-input" style="font-size: 1.3rem; font-weight: 900; text-align: center;" min="0" max="20" value="4">
+                <div class="stat-metric-sub" data-i18n="stat_karma_sub">Startet standardmäßig bei Rang</div>
+            </div>
+
+            <!-- Health & Damage Reduction -->
+            <div class="stat-metric-card">
+                <div class="stat-metric-label" data-i18n="stat_health">Gesundheit</div>
+                <div id="val-health-max" class="stat-metric-value" style="color: #f87171;">90</div>
+                <div class="stat-metric-sub">
+                    <span>DR:</span>
+                    <input type="text" id="char-dr-health" class="form-input" style="width: 55px; padding: 2px 4px; text-align: center;" placeholder="—" value="—" title="Damage Reduction für Health">
+                    <span style="font-size: 0.65rem;">(Res × 30)</span>
+                </div>
+            </div>
+
+            <!-- Focus & Damage Reduction -->
+            <div class="stat-metric-card">
+                <div class="stat-metric-label" data-i18n="stat_focus">Fokus</div>
+                <div id="val-focus-max" class="stat-metric-value" style="color: #60a5fa;">90</div>
+                <div class="stat-metric-sub">
+                    <span>DR:</span>
+                    <input type="text" id="char-dr-focus" class="form-input" style="width: 55px; padding: 2px 4px; text-align: center;" placeholder="—" value="—" title="Damage Reduction für Focus">
+                    <span style="font-size: 0.65rem;">(Vig × 30)</span>
+                </div>
+            </div>
+
+            <!-- Initiative Modifier -->
+            <div class="stat-metric-card">
+                <div class="stat-metric-label" data-i18n="stat_initiative">Initiative-Modifier</div>
+                <div id="val-initiative-display" class="stat-metric-value" style="color: #fbbf24;">+3E</div>
+                <div class="stat-metric-sub">
+                    <label style="display: inline-flex; align-items: center; gap: 4px; cursor: pointer; color: var(--text-main);">
+                        <input type="checkbox" id="char-initiative-edge" checked>
+                        <span data-i18n="stat_with_edge">Mit Edge (E)</span>
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <!-- Regel-Notiz für Rang-Vorgaben -->
+        <div class="rule-helper-note" id="rule-note-rank">
+            <span class="rule-note-icon">ℹ️</span>
+            <span class="rule-note-text">
+                Der Rang bestimmt das Punktebudget von <strong class="rule-base-points-num">5</strong> Ability Points, das Attribut-Maximum von <strong class="rule-cap-num">4</strong> sowie das Limit von <strong class="rule-base-powers-num">4</strong> Kräften und <strong class="rule-base-traits-num">5</strong> Traits. Nicht genutzte Kräfte können 1 zu 1 in Ability Points oder Traits umgewandelt werden.
+            </span>
+        </div>
+
+        <!-- 1. M.A.R.V.E.L. Attribute, Verteidigungen & Non-Combat Checks -->
+        <section class="section-card">
+            <div class="section-header">
+                <h2 class="section-title">
+                    <span class="badge-num">1</span>
+                    <span data-i18n="section_1_title">M.A.R.V.E.L. Attribute, Verteidigung & Checks</span>
+                </h2>
+                <div class="section-header-actions">
+                    <div id="ability-points-budget" class="ability-points-pill" title="Ability Points Budget">
+                        Punkte: <strong id="val-ability-spent">0</strong> / <strong id="val-ability-max">20</strong>
+                        <span id="badge-ability-status" class="points-status-badge">0 übrig</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Regel-Notiz für Section 1 -->
+            <div class="rule-helper-note" id="rule-note-abilities">
+                <span class="rule-note-icon">💡</span>
+                <span class="rule-note-text">
+                    Das Punktebudget beträgt <strong class="rule-points-num">5</strong> Ability Points. Der Maximalwert pro Attribut liegt bei <strong class="rule-cap-num">4</strong>. Werte bis -3 sind erlaubt und geben Punkte für andere Attribute frei.
+                </span>
+            </div>
+
+            <div class="abilities-grid">
+                <!-- Melee -->
+                <div class="ability-card">
+                    <div class="ability-letter">M</div>
+                    <div class="ability-name">Melee</div>
+                    <div class="ability-sub" data-i18n="sub_melee">Nahkampf & Physis</div>
+                    <div class="ability-score-box">
+                        <input type="number" id="stat-melee" class="ability-score-input" value="5" min="-5" max="20">
+                    </div>
+                    <div class="ability-meta-box">
+                        <div class="ability-meta-row">
+                            <span>Defense: <strong id="def-val-melee" style="color: var(--marvel-blue);">19</strong></span>
+                            <input type="number" id="bonus-def-melee" class="ability-bonus-input" placeholder="+Bon" value="4" title="Bonus auf Melee-Verteidigung (z.B. durch Powers)">
+                        </div>
+                        <div class="ability-meta-row">
+                            <span>Check: <strong id="check-val-melee" style="color: var(--marvel-gold);">+6</strong></span>
+                            <input type="number" id="bonus-check-melee" class="ability-bonus-input" placeholder="+Bon" value="1" title="Bonus auf Non-Combat Checks">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Agility -->
+                <div class="ability-card">
+                    <div class="ability-letter">A</div>
+                    <div class="ability-name">Agility</div>
+                    <div class="ability-sub" data-i18n="sub_agility">Fernkampf & Reflexe</div>
+                    <div class="ability-score-box">
+                        <input type="number" id="stat-agility" class="ability-score-input" value="7" min="-5" max="20">
+                    </div>
+                    <div class="ability-meta-box">
+                        <div class="ability-meta-row">
+                            <span>Defense: <strong id="def-val-agility" style="color: var(--marvel-blue);">19</strong></span>
+                            <input type="number" id="bonus-def-agility" class="ability-bonus-input" placeholder="+Bon" value="2" title="Bonus auf Agility-Verteidigung (z.B. Evasion)">
+                        </div>
+                        <div class="ability-meta-row">
+                            <span>Check: <strong id="check-val-agility" style="color: var(--marvel-gold);">+7</strong></span>
+                            <input type="number" id="bonus-check-agility" class="ability-bonus-input" placeholder="+Bon" value="0" title="Bonus auf Non-Combat Checks">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Resilience -->
+                <div class="ability-card">
+                    <div class="ability-letter">R</div>
+                    <div class="ability-name">Resilience</div>
+                    <div class="ability-sub" data-i18n="sub_resilience">Zähigkeit & Leben</div>
+                    <div class="ability-score-box">
+                        <input type="number" id="stat-resilience" class="ability-score-input" value="3" min="-5" max="20">
+                    </div>
+                    <div class="ability-meta-box">
+                        <div class="ability-meta-row">
+                            <span>Defense: <strong id="def-val-resilience" style="color: var(--marvel-blue);">13</strong></span>
+                            <input type="number" id="bonus-def-resilience" class="ability-bonus-input" placeholder="+Bon" value="0" title="Bonus auf Resilience-Verteidigung">
+                        </div>
+                        <div class="ability-meta-row">
+                            <span>Check: <strong id="check-val-resilience" style="color: var(--marvel-gold);">+3</strong></span>
+                            <input type="number" id="bonus-check-resilience" class="ability-bonus-input" placeholder="+Bon" value="0" title="Bonus auf Non-Combat Checks">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Vigilance -->
+                <div class="ability-card">
+                    <div class="ability-letter">V</div>
+                    <div class="ability-name">Vigilance</div>
+                    <div class="ability-sub" data-i18n="sub_vigilance">Wahrnehmung & Fokus</div>
+                    <div class="ability-score-box">
+                        <input type="number" id="stat-vigilance" class="ability-score-input" value="3" min="-5" max="20">
+                    </div>
+                    <div class="ability-meta-box">
+                        <div class="ability-meta-row">
+                            <span>Defense: <strong id="def-val-vigilance" style="color: var(--marvel-blue);">13</strong></span>
+                            <input type="number" id="bonus-def-vigilance" class="ability-bonus-input" placeholder="+Bon" value="0" title="Bonus auf Vigilance-Verteidigung">
+                        </div>
+                        <div class="ability-meta-row">
+                            <span>Check: <strong id="check-val-vigilance" style="color: var(--marvel-gold);">+3</strong></span>
+                            <input type="number" id="bonus-check-vigilance" class="ability-bonus-input" placeholder="+Bon" value="0" title="Bonus auf Non-Combat Checks">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Ego -->
+                <div class="ability-card">
+                    <div class="ability-letter">E</div>
+                    <div class="ability-name">Ego</div>
+                    <div class="ability-sub" data-i18n="sub_ego">Charisma & Willenskraft</div>
+                    <div class="ability-score-box">
+                        <input type="number" id="stat-ego" class="ability-score-input" value="0" min="-5" max="20">
+                    </div>
+                    <div class="ability-meta-box">
+                        <div class="ability-meta-row">
+                            <span>Defense: <strong id="def-val-ego" style="color: var(--marvel-blue);">14</strong></span>
+                            <input type="number" id="bonus-def-ego" class="ability-bonus-input" placeholder="+Bon" value="4" title="Bonus auf Ego-Verteidigung (z.B. Integrity)">
+                        </div>
+                        <div class="ability-meta-row">
+                            <span>Check: <strong id="check-val-ego" style="color: var(--marvel-gold);">0</strong></span>
+                            <input type="number" id="bonus-check-ego" class="ability-bonus-input" placeholder="+Bon" value="0" title="Bonus auf Non-Combat Checks">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Logic -->
+                <div class="ability-card">
+                    <div class="ability-letter">L</div>
+                    <div class="ability-name">Logic</div>
+                    <div class="ability-sub" data-i18n="sub_logic">Wissen & Taktik</div>
+                    <div class="ability-score-box">
+                        <input type="number" id="stat-logic" class="ability-score-input" value="4" min="-5" max="20">
+                    </div>
+                    <div class="ability-meta-box">
+                        <div class="ability-meta-row">
+                            <span>Defense: <strong id="def-val-logic" style="color: var(--marvel-blue);">14</strong></span>
+                            <input type="number" id="bonus-def-logic" class="ability-bonus-input" placeholder="+Bon" value="0" title="Bonus auf Logic-Verteidigung">
+                        </div>
+                        <div class="ability-meta-row">
+                            <span>Check: <strong id="check-val-logic" style="color: var(--marvel-gold);">+5</strong></span>
+                            <input type="number" id="bonus-check-logic" class="ability-bonus-input" placeholder="+Bon" value="1" title="Bonus auf Non-Combat Checks (z.B. Brilliance)">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 2. Schadensberechnung (Damage Multipliers) -->
+        <section class="section-card">
+            <div class="section-header">
+                <h2 class="section-title">
+                    <span class="badge-num">2</span>
+                    <span data-i18n="section_2_title">Schadensmultiplikatoren</span>
+                </h2>
+                <div style="font-size: 0.8rem; color: var(--text-muted);" data-i18n="section_2_formula">
+                    Formel: [M-Dice] × Multiplikator + Ability Score
+                </div>
+            </div>
+
+            <!-- Regel-Notiz für Section 2 -->
+            <div class="rule-helper-note" id="rule-note-damage">
+                <span class="rule-note-icon">💡</span>
+                <span class="rule-note-text">
+                    Der Basis-Schadensmultiplikator entspricht dem Rang. Bestimmte Kräfte erhöhen diesen Multiplikator weiter.
+                </span>
+            </div>
+
+            <div class="damage-cards-grid">
+                <!-- Melee Damage -->
+                <div class="damage-card">
+                    <div class="damage-card-type">MELEE DAMAGE</div>
+                    <div id="disp-damage-melee" class="damage-formula-pill">M-Dice × 1 + 1</div>
+                    <div class="damage-bonus-row">
+                        <span>Multiplikator-Bonus:</span>
+                        <input type="number" id="dmg-bonus-melee" class="ability-bonus-input" value="0" title="+1 durch Powers wie Mighty">
+                    </div>
+                </div>
+
+                <!-- Agility Damage -->
+                <div class="damage-card">
+                    <div class="damage-card-type">AGILITY DAMAGE</div>
+                    <div id="disp-damage-agility" class="damage-formula-pill">M-Dice × 1 + 1</div>
+                    <div class="damage-bonus-row">
+                        <span>Multiplikator-Bonus:</span>
+                        <input type="number" id="dmg-bonus-agility" class="ability-bonus-input" value="0" title="Bonus auf Agility Multiplikator">
+                    </div>
+                </div>
+
+                <!-- Ego Damage -->
+                <div class="damage-card">
+                    <div class="damage-card-type">EGO DAMAGE</div>
+                    <div id="disp-damage-ego" class="damage-formula-pill">M-Dice × 1 + 1</div>
+                    <div class="damage-bonus-row">
+                        <span>Multiplikator-Bonus:</span>
+                        <input type="number" id="dmg-bonus-ego" class="ability-bonus-input" value="0" title="Bonus auf Ego Multiplikator">
+                    </div>
+                </div>
+
+                <!-- Logic Damage -->
+                <div class="damage-card">
+                    <div class="damage-card-type">LOGIC DAMAGE</div>
+                    <div id="disp-damage-logic" class="damage-formula-pill">M-Dice × 1 + 0</div>
+                    <div class="damage-bonus-row">
+                        <span>Multiplikator-Bonus:</span>
+                        <input type="number" id="dmg-bonus-logic" class="ability-bonus-input" value="0" title="Bonus auf Logic Multiplikator">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. Fortbewegung & Geschwindigkeiten -->
+        <section class="section-card">
+            <div class="section-header">
+                <h2 class="section-title">
+                    <span class="badge-num">3</span>
+                    <span data-i18n="section_3_title">Fortbewegung & Geschwindigkeiten</span>
+                </h2>
+                <div class="section-header-actions">
+                    <button id="btn-add-extra-speed" class="btn btn-primary btn-sm" title="z.B. Flight, Swingline, Glide">
+                        <span data-i18n="btn_add_speed">+ Neue Fortbewegung</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Standard-Geschwindigkeiten -->
+            <div class="speed-inputs-grid">
+                <div class="form-group">
+                    <label class="form-label" for="speed-run" data-i18n="speed_run">Run (Laufen)</label>
+                    <input type="number" id="speed-run" class="form-input" min="1" max="100" value="6">
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="speed-climb" data-i18n="speed_climb">Climb (Klettern)</label>
+                    <input type="number" id="speed-climb" class="form-input" min="1" max="100" value="6">
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="speed-jump" data-i18n="speed_jump">Jump (Springen)</label>
+                    <input type="number" id="speed-jump" class="form-input" min="1" max="100" value="6">
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="speed-swim" data-i18n="speed_swim">Swim (Schwimmen)</label>
+                    <input type="number" id="speed-swim" class="form-input" min="1" max="100" value="3">
+                </div>
+            </div>
+
+            <!-- Dynamische Sonder-Geschwindigkeiten (z.B. Swingline, Glide, Flight) -->
+            <div id="extra-speeds-container">
+                <!-- Dynamisch generiert -->
+            </div>
+        </section>
+
+        <!-- 4. Identität & Physische Details (Biografie) -->
+        <section class="section-card">
+            <div class="section-header">
+                <h2 class="section-title">
+                    <span class="badge-num">4</span>
+                    <span data-i18n="section_4_title">Helden-Identität & Physische Details</span>
+                </h2>
+            </div>
+
+            <div class="form-grid">
+                <div class="form-group">
+                    <label class="form-label" for="char-name" data-i18n="lbl_hero_name">Heldenname</label>
+                    <input type="text" id="char-name" class="form-input" placeholder="z.B. Shadow Knight" data-i18n-placeholder="ph_char_name">
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="char-real-name" data-i18n="lbl_real_name">Bürgerlicher Name</label>
+                    <input type="text" id="char-real-name" class="form-input" placeholder="John Doe" data-i18n-placeholder="ph_char_real_name">
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="char-player-name" data-i18n="lbl_player">Spieler / Narrator</label>
+                    <input type="text" id="char-player-name" class="form-input" placeholder="Dein Name" data-i18n-placeholder="ph_char_player">
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="char-height" data-i18n="lbl_height">Größe</label>
+                    <input type="text" id="char-height" class="form-input" placeholder="5'10&quot; (1,78 m)" data-i18n-placeholder="ph_char_height">
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="char-weight" data-i18n="lbl_weight">Gewicht</label>
+                    <input type="text" id="char-weight" class="form-input" placeholder="170 lbs. (77 kg)" data-i18n-placeholder="ph_char_weight">
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="char-gender" data-i18n="lbl_gender">Geschlecht</label>
+                    <input type="text" id="char-gender" class="form-input" placeholder="Männlich / Weiblich / Divers" data-i18n-placeholder="ph_char_gender">
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="char-eyes" data-i18n="lbl_eyes">Augen</label>
+                    <input type="text" id="char-eyes" class="form-input" placeholder="Braun / Blau / Grün..." data-i18n-placeholder="ph_char_eyes">
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="char-hair" data-i18n="lbl_hair">Haare</label>
+                    <input type="text" id="char-hair" class="form-input" placeholder="Schwarz / Braun / Blond..." data-i18n-placeholder="ph_char_hair">
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="char-size" data-i18n="lbl_size">Größenkategorie</label>
+                    <select id="char-size" class="form-select"></select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="char-dist-features" data-i18n="lbl_dist_features">Besondere Merkmale</label>
+                    <input type="text" id="char-dist-features" class="form-input" placeholder="Narben, Tätowierungen, Maske..." data-i18n-placeholder="ph_char_dist_features">
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="char-origin" data-i18n="lbl_origin">Herkunft</label>
+                    <div class="input-with-select-wrap">
+                        <input type="text" id="char-origin" class="form-input" placeholder="z.B. High-Tech, Mutant, Alien..." data-i18n-placeholder="ph_char_origin">
+                        <select id="origin-preset-select" class="form-select form-select-addon" title="Offizielle Herkunft auswählen">
+                            <option value="" data-i18n="opt_pick_preset">Vorgaben</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="char-occupation" data-i18n="lbl_occupation">Beruf</label>
+                    <div class="input-with-select-wrap">
+                        <input type="text" id="char-occupation" class="form-input" placeholder="z.B. Adventurer, Scientist, Student..." data-i18n-placeholder="ph_char_occupation">
+                        <select id="occupation-preset-select" class="form-select form-select-addon" title="Offiziellen Beruf auswählen">
+                            <option value="" data-i18n="opt_pick_preset">Vorgaben</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="char-identity" data-i18n="lbl_identity">Identitätsstatus</label>
+                    <select id="char-identity" class="form-select">
+                        <option value="Geheim">Geheim</option>
+                        <option value="Öffentlich">Öffentlich</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="char-base" data-i18n="lbl_base">Einsatzbasis</label>
+                    <input type="text" id="char-base" class="form-input" placeholder="New York City" data-i18n-placeholder="ph_char_base">
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="char-teams" data-i18n="lbl_teams">Teams & Allianzen</label>
+                    <input type="text" id="char-teams" class="form-input" placeholder="Midnight Sons, Champions, Freelance..." data-i18n-placeholder="ph_char_teams">
+                </div>
+            </div>
+        </section>
+
+        <!-- 5. Kräfte (Powers) -->
+        <section class="section-card">
+            <div class="section-header">
+                <h2 class="section-title">
+                    <span class="badge-num">5</span>
+                    <span data-i18n="section_5_title">Kräfte</span>
+                    <span id="power-count-badge" class="badge-num">0</span>
+                </h2>
+                <div class="section-header-actions">
+                    <label class="setting-checkbox-label" title="Erklärungen und Effekte der Kräfte auf dem Druckbogen anzeigen">
+                        <input type="checkbox" id="toggle-power-desc-editor">
+                        <span data-i18n="toggle_power_desc">Erklärungen im Bogen anzeigen</span>
+                    </label>
+                    <button id="btn-open-powers-compendium" class="btn btn-secondary btn-sm" title="Aus der offiziellen Liste wählen">
+                        <span data-i18n="btn_compendium_powers">📖 Aus Bibliothek auswählen</span>
+                    </button>
+                    <button id="btn-add-power" class="btn btn-primary btn-sm">
+                        <span data-i18n="btn_add_power">+ Neue Kraft</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Regel-Notiz für Section 5 -->
+            <div class="rule-helper-note" id="rule-note-powers">
+                <span class="rule-note-icon">💡</span>
+                <span class="rule-note-text">
+                    Erlaubt sind maximal <strong class="rule-powers-num">4</strong> Kräfte.
+                </span>
+            </div>
+
+            <div id="powers-list" class="powers-list">
+                <!-- Dynamisch durch app.js -->
+            </div>
+        </section>
+
+        <!-- 6. Traits & Tags -->
+        <section class="section-card">
+            <div class="section-header">
+                <h2 class="section-title">
+                    <span class="badge-num">6</span>
+                    <span data-i18n="section_6_title">Traits & Tags</span>
+                </h2>
+            </div>
+
+            <!-- Regel-Notiz für Section 6 -->
+            <div class="rule-helper-note" id="rule-note-traits">
+                <span class="rule-note-icon">💡</span>
+                <span class="rule-note-text">
+                    Erlaubt sind bis zu <strong class="rule-traits-num">5</strong> Traits. Tags sind rein narrativ und haben kein Limit.
+                </span>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 20px;">
+                <!-- Traits -->
+                <div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                        <h3 style="font-size: 0.95rem; text-transform: uppercase; color: var(--text-muted); display: flex; align-items: center; gap: 6px;">
+                            Traits
+                            <span id="trait-count-badge" class="badge-num">0</span>
+                        </h3>
+                        <div style="display: flex; gap: 6px;">
+                            <button id="btn-open-traits-compendium" class="btn btn-secondary btn-sm" title="Aus offizieller Liste wählen">
+                                <span data-i18n="btn_compendium_traits">📖 Aus Bibliothek</span>
+                            </button>
+                            <button id="btn-add-trait" class="btn btn-primary btn-sm">
+                                <span data-i18n="btn_add_trait">+ Neuer Trait</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div id="traits-list"></div>
+                </div>
+
+                <!-- Tags -->
+                <div>
+                    <h3 style="font-size: 0.95rem; text-transform: uppercase; color: var(--text-muted); margin-bottom: 10px;">Tags</h3>
+                    <div style="display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap;">
+                        <select id="tag-picker-select" class="form-select" style="flex: 1; min-width: 170px;">
+                            <option value="" data-i18n="tag_picker_default">★ Tag aus Liste wählen...</option>
+                        </select>
+                        <input type="text" id="tag-input" class="form-input" style="flex: 1; min-width: 130px;" placeholder="Oder eigener Tag..." data-i18n-placeholder="ph_tag_custom">
+                        <button id="btn-add-tag" class="btn btn-secondary btn-sm">
+                            <span data-i18n="btn_add_tag">+ Neuer Tag</span>
+                        </button>
+                    </div>
+                    <div id="tags-list" class="tags-container"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 7. Biografie: History & Personality -->
+        <section class="section-card">
+            <div class="section-header">
+                <h2 class="section-title">
+                    <span class="badge-num">7</span>
+                    <span data-i18n="section_7_title">Biografie & Persönlichkeit</span>
+                </h2>
+            </div>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                <div class="form-group">
+                    <label class="form-label" for="char-history" data-i18n="lbl_history">Geschichte & Werdegang</label>
+                    <textarea id="char-history" class="form-textarea" rows="12" placeholder="Eigene Heldengeschichte und Ursprung..." data-i18n-placeholder="ph_char_history"></textarea>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="char-personality" data-i18n="lbl_personality">Persönlichkeit & Motivation</label>
+                    <textarea id="char-personality" class="form-textarea" rows="12" placeholder="Persönlichkeit, Werte, Kodex und Antriebe..." data-i18n-placeholder="ph_char_personality"></textarea>
+                </div>
+            </div>
+        </section>
+
+        <!-- Rechtlicher Footer & Fan-Content Disclaimer -->
+        <footer class="app-footer no-print">
+            <div class="footer-content">
+                <p class="footer-disclaimer" data-i18n="footer_disclaimer">
+                    <strong>Disclaimer:</strong> Dies ist ein unabhängiges, nicht-kommerzielles Fan-Begleitwerkzeug für das <em>Multiverse d616 Rollenspielsystem</em>. Nicht autorisiert, unterstützt oder verbunden mit Marvel Characters, Inc. oder The Walt Disney Company. Alle ursprünglichen Spielmechaniken, Markenzeichen und Urheberrechte sind Eigentum ihrer jeweiligen Inhaber. Alle Rechte vorbehalten.
+                </p>
+                <div class="footer-meta" style="margin-top: 14px; font-size: 0.8rem; color: var(--text-dim); display: flex; justify-content: center; align-items: center; gap: 14px; flex-wrap: wrap;">
+                    <span><span data-i18n="footer_contact">📧 Kontakt:</span> <a href="mailto:alemario2106@gmail.com" style="color: var(--text-main); font-weight: 600; text-decoration: underline;">alemario2106@gmail.com</a></span>
+                </div>
+            </div>
+        </footer>
+
+    </main>
+
+    <!-- =======================================================================
+         Offizielle Druckansicht & Bogen-Vorschau Toolbar
+         ======================================================================= -->
+    <div id="preview-toolbar" class="preview-toolbar no-print">
+        <!-- Gruppe 1: Allgemeine Anzeige -->
+        <div class="preview-toolbar-group">
+            <label class="setting-checkbox-label" title="Erklärungen und Effekte der Kräfte auf dem Druckbogen anzeigen">
+                <input type="checkbox" id="toggle-power-desc-preview">
+                <span data-i18n="pt_power_desc">📖 Kraft-Erklärungen</span>
+            </label>
+        </div>
+
+        <div class="preview-toolbar-divider"></div>
+
+        <!-- Gruppe 2: Charakterbild Aktionen -->
+        <div class="preview-toolbar-group">
+            <span class="preview-toolbar-label" data-i18n="pt_hero_image">Heldenbild:</span>
+            <button id="btn-upload-portrait" class="btn btn-secondary btn-sm" title="Bilddatei vom Computer hochladen (PNG, JPG, WebP)">
+                <span data-i18n="pt_choose_image">🖼️ Bild wählen</span>
+            </button>
+            <button id="btn-url-portrait" class="btn btn-secondary btn-sm" title="Bild über Internetadresse (URL) einfügen">
+                <span data-i18n="pt_url">🌐 URL</span>
+            </button>
+            <button id="btn-remove-portrait" class="btn btn-danger btn-sm" title="Bild entfernen" style="display: none;">
+                <span data-i18n="pt_delete_image">✕ Bild löschen</span>
+            </button>
+            <input type="file" id="portrait-file-input" accept="image/*" style="display: none;">
+        </div>
+
+        <div class="preview-toolbar-divider"></div>
+
+        <!-- Gruppe 3: Schieberegler & Pixel für Breite und Höhe -->
+        <div class="preview-toolbar-group">
+            <div class="preview-dimension-control" title="Breite der linken Spalte / des Bildes in Pixeln (150 - 270 px)">
+                <span class="dimension-label" data-i18n="pt_width">Breite:</span>
+                <input type="range" id="portrait-width-range" min="150" max="270" value="200" step="1" class="dimension-slider">
+                <input type="number" id="portrait-width-num" min="150" max="270" value="200" step="1" class="dimension-input">
+                <span class="dimension-unit">px</span>
+            </div>
+
+            <div class="preview-dimension-control" title="Höhe des Bildkastens in Pixeln (60 - 250 px)">
+                <span class="dimension-label" data-i18n="pt_height">Höhe:</span>
+                <input type="range" id="portrait-height-range" min="60" max="250" value="125" step="1" class="dimension-slider">
+                <input type="number" id="portrait-height-num" min="60" max="250" value="125" step="1" class="dimension-input">
+                <span class="dimension-unit">px</span>
+            </div>
+        </div>
+
+        <div class="preview-toolbar-divider"></div>
+
+        <!-- Gruppe 4: Anpassungs-Buttons & Reset -->
+        <div class="preview-toolbar-group">
+            <button id="btn-fit-original-size" class="btn btn-primary btn-sm" title="Passt die Bildgröße der Vorschau an das Originalverhältnis des Bildes an">
+                <span data-i18n="pt_fit_original">📐 An Originalgröße anpassen</span>
+            </button>
+            <button id="btn-reset-portrait-size" class="btn btn-secondary btn-sm" title="Setzt Bildbreite (200px) und Höhe (125px) auf Standardwerte zurück">
+                <span data-i18n="pt_reset">↺ Standard</span>
+            </button>
+        </div>
+    </div>
+
+    <div id="print-sheet">
+        <!-- Wird dynamisch durch app.js exakt wie die Core Rulebook Seite formatiert -->
+    </div>
+
+    <!-- =======================================================================
+         Modal: Einstellungen (Settings)
+         ======================================================================= -->
+    <div id="settings-modal" class="modal-overlay">
+        <div class="modal-card" style="max-width: 520px; width: 95%;">
+            <div class="modal-header">
+                <h3 style="font-size: 1.15rem; color: #ffffff; display: flex; align-items: center; gap: 8px;">
+                    <span>⚙️</span> <span data-i18n="settings_title">Einstellungen</span>
+                </h3>
+                <button id="btn-close-settings" class="modal-close">&times;</button>
+            </div>
+            
+            <div class="settings-modal-body" style="display: flex; flex-direction: column; gap: 14px; padding: 12px 0;">
+                <!-- 1. Offizielle Regeln -->
+                <div class="settings-row">
+                    <div class="settings-row-info">
+                        <div class="settings-row-title" data-i18n="setting_rules_title">Regeln befolgen</div>
+                        <div class="settings-row-desc" data-i18n="setting_rules_desc">Punktebudget, Attribut-Caps und Limits je nach Rang erzwingen</div>
+                    </div>
+                    <label class="switch-toggle" title="Regeln befolgen">
+                        <input type="checkbox" id="toggle-rule-compliance-settings" checked>
+                        <span class="slider round"></span>
+                    </label>
+                </div>
+
+                <!-- 2. Sprache -->
+                <div class="settings-row">
+                    <div class="settings-row-info">
+                        <div class="settings-row-title" data-i18n="setting_lang_title">Sprache / Language</div>
+                        <div class="settings-row-desc" data-i18n="setting_lang_desc">Benutzeroberfläche und Hilfetexte übersetzen</div>
+                    </div>
+                    <select id="language-select" class="form-select language-settings-select">
+                        <option value="de">🇩🇪 Deutsch</option>
+                        <option value="en">🇬🇧 English</option>
+                        <option value="es">🇪🇸 Español</option>
+                        <option value="it">🇮🇹 Italiano</option>
+                        <option value="fr">🇫🇷 Français</option>
+                    </select>
+                </div>
+
+                <!-- 3. Design (Hell / Dunkel) -->
+                <div class="settings-row">
+                    <div class="settings-row-info">
+                        <div class="settings-row-title" data-i18n="setting_theme_title">Farbschema / Theme</div>
+                        <div class="settings-row-desc" data-i18n="setting_theme_desc">Zwischen Dunkel- und Hell-Modus umschalten</div>
+                    </div>
+                    <button id="btn-theme-toggle" class="btn btn-secondary btn-sm" style="min-width: 100px; height: 34px;">
+                        <span id="theme-icon">☀️</span> <span id="theme-label" data-i18n="theme_light">Hell</span>
+                    </button>
+                </div>
+
+                <!-- 4. Kontakt -->
+                <div class="settings-contact-box">
+                    <span data-i18n="setting_contact">Feedback, Wünsche oder Fragen? Schreibe gerne an:</span><br>
+                    <a href="mailto:alemario2106@gmail.com" class="contact-email-link">alemario2106@gmail.com</a>
+                </div>
+            </div>
+
+            <div style="display: flex; justify-content: flex-end; margin-top: 10px;">
+                <button id="btn-close-settings-done" class="btn btn-primary btn-sm" data-i18n="btn_done">Fertig</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- =======================================================================
+         Modal: Kompendium / Bibliothek (Powers & Traits Picker)
+         ======================================================================= -->
+    <div id="compendium-modal" class="modal-overlay">
+        <div class="modal-card" style="max-width: 780px; width: 95%;">
+            <div class="modal-header">
+                <h3 id="compendium-modal-title" style="font-size: 1.15rem; color: #ffffff; display: flex; align-items: center; gap: 8px;" data-i18n="modal_compendium_title">
+                    📖 Offizielle Bibliothek
+                </h3>
+                <button id="btn-close-compendium" class="modal-close">&times;</button>
+            </div>
+            
+            <!-- Such- und Filterleiste -->
+            <div class="compendium-search-bar">
+                <input type="text" id="compendium-search-input" class="form-input" style="flex: 2; min-width: 200px;" placeholder="🔍 Suchen nach Name oder Effekt (z.B. Mighty, Shield, Blast)..." data-i18n-placeholder="compendium_search_ph">
+                <select id="compendium-filter-set" class="form-select" style="flex: 1; min-width: 160px;">
+                    <option value="" data-i18n="compendium_all_sets">Alle Kraftgruppen</option>
+                </select>
+            </div>
+
+            <!-- Ergebnisliste mit Scrollbalken -->
+            <div id="compendium-results-list" class="compendium-list-scroll">
+                <!-- Dynamisch generiert durch app.js -->
+            </div>
+        </div>
+    </div>
+
+    <!-- =======================================================================
+         Modal: Willkommen & Sprachauswahl (Language Selector)
+         ======================================================================= -->
+    <div id="language-welcome-modal" class="modal-overlay">
+        <div class="modal-card" style="max-width: 480px; width: 92%; text-align: center;">
+            <div class="modal-header" style="justify-content: center; position: relative;">
+                <h3 style="font-size: 1.18rem; font-weight: 800; color: #ffffff;" data-i18n="welcome_lang_title">
+                    🌐 Sprache wählen / Choose Language
+                </h3>
+                <button id="btn-close-lang-modal" class="modal-close" style="position: absolute; right: 16px;">&times;</button>
+            </div>
+            
+            <div style="padding: 16px 12px 10px;">
+                <p style="color: var(--text-dim); margin-bottom: 20px; font-size: 0.92rem; line-height: 1.45;" data-i18n="welcome_lang_desc">
+                    Wähle deine bevorzugte Sprache für den Editor, die Regeln und die Bogen-Vorschau.
+                </p>
+                <div class="lang-welcome-grid">
+                    <button type="button" class="btn-lang-choice" data-lang="en">
+                        <span class="lang-flag">🇬🇧</span>
+                        <span class="lang-name">English</span>
+                    </button>
+                    <button type="button" class="btn-lang-choice" data-lang="de">
+                        <span class="lang-flag">🇩🇪</span>
+                        <span class="lang-name">Deutsch</span>
+                    </button>
+                    <button type="button" class="btn-lang-choice" data-lang="es">
+                        <span class="lang-flag">🇪🇸</span>
+                        <span class="lang-name">Español</span>
+                    </button>
+                    <button type="button" class="btn-lang-choice" data-lang="it">
+                        <span class="lang-flag">🇮🇹</span>
+                        <span class="lang-name">Italiano</span>
+                    </button>
+                    <button type="button" class="btn-lang-choice" data-lang="fr">
+                        <span class="lang-flag">🇫🇷</span>
+                        <span class="lang-name">Français</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Benachrichtigungen -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <!-- Scripts -->
+    <script src="js/rules.js"></script>
+    <script src="js/compendium.js"></script>
+    <script src="js/sample-characters.js"></script>
+    <script src="js/i18n.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>

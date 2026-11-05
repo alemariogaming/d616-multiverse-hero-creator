@@ -1,0 +1,843 @@
+/* ==========================================================================
+   Marvel Multiverse RPG - Offizielles Druck- & Bogen-Vorschau Layout
+   Exakte 3-Spalten Nachbildung des offiziellen Marvel Core Rulebook Bogens
+   Optimiert, um die volle DIN A4 Seite (210 x 297 mm) perfekt auszufüllen
+   ========================================================================== */
+
+#print-sheet {
+    display: none;
+}
+
+/* --------------------------------------------------------------------------
+   Bogen-Vorschau im Browser (Simuliertes DIN A4 Blatt)
+   -------------------------------------------------------------------------- */
+#print-sheet.preview-mode {
+    display: flex !important;
+    flex-direction: column;
+    background: #ffffff !important;
+    color: #111827 !important;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    font-size: 8.5pt;
+    line-height: 1.25;
+    width: 210mm;
+    height: 297mm;
+    margin: 15px auto 40px auto;
+    padding: 7mm 9mm;
+    box-shadow: 0 14px 50px rgba(0, 0, 0, 0.75);
+    border-radius: 4px;
+    border: 1px solid #d1d5db;
+    box-sizing: border-box;
+    overflow: hidden;
+}
+
+/* --------------------------------------------------------------------------
+   Druck-Layout Definitionen (Für Vorschau und @media print)
+   -------------------------------------------------------------------------- */
+.official-sheet {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    box-sizing: border-box;
+}
+
+/* Titelzeile oben */
+.official-header {
+    border-bottom: 3px solid #b91c1c;
+    padding-bottom: 4px;
+    margin-bottom: 6px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+}
+
+.official-char-title {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    font-size: 16pt;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #111827;
+    line-height: 1.1;
+}
+
+.official-logo-tag {
+    background: #b91c1c !important;
+    color: #ffffff !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 9.5pt;
+    font-weight: 700;
+    padding: 2.5px 8px;
+    letter-spacing: 0.8px;
+    border-radius: 2px;
+}
+
+/* Das 3-Spalten-Raster des offiziellen Sheets - Nutzt 100% der Breite & Höhe ohne Überlauf */
+.official-grid {
+    display: grid;
+    grid-template-columns: var(--col-left-width, 27fr) 39fr 34fr;
+    gap: 8px;
+    width: 100%;
+    flex: 1;
+    min-height: 0;
+    box-sizing: border-box;
+    transition: grid-template-columns 0.1s ease;
+}
+
+/* ==========================================================================
+   SPALTE 1: PORTRAIT, ABILITIES, DAMAGE
+   ========================================================================== */
+.col-left {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100%;
+    min-height: 0;
+}
+
+.official-portrait-box {
+    width: 100%;
+    height: var(--portrait-height, 125px);
+    max-height: var(--portrait-height, 125px);
+    border: 2px solid #b91c1c;
+    border-radius: 4px;
+    background: #f8fafc;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    position: relative;
+    margin-bottom: 5px;
+    box-sizing: border-box;
+    flex-shrink: 0;
+    cursor: pointer;
+    transition: height 0.1s ease;
+}
+
+.official-portrait-box:hover .portrait-overlay-hint {
+    opacity: 1;
+}
+
+.portrait-overlay-hint {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(15, 23, 42, 0.82);
+    color: #ffffff;
+    font-size: 6.5pt;
+    font-weight: 600;
+    text-align: center;
+    padding: 3px 4px;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    pointer-events: none;
+    letter-spacing: 0.3px;
+}
+
+.official-portrait-box img {
+    width: 100%;
+    height: 100%;
+    object-fit: var(--portrait-fit, cover);
+    display: block;
+}
+
+.portrait-placeholder {
+    font-size: 7.5pt;
+    color: #64748b;
+    text-align: center;
+    padding: 8px;
+    cursor: pointer;
+}
+
+/* ABILITIES Tabelle - Ausgewogen und klar lesbar */
+.official-abilities-box {
+    border: 2px solid #b91c1c;
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 6px;
+    flex: 1.25;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+}
+
+.abilities-header-bar {
+    background: #b91c1c !important;
+    color: #ffffff !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 8.5pt;
+    font-weight: 700;
+    padding: 2.5px 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+}
+
+.abilities-table {
+    width: 100%;
+    height: 100%;
+    border-collapse: collapse;
+    font-size: 8pt;
+    text-align: center;
+    flex: 1;
+    min-height: 0;
+    table-layout: fixed;
+}
+
+.abilities-table th {
+    background: #1e293b !important;
+    color: #ffffff !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+    padding: 3.5px 2px;
+    font-size: 6pt;
+    font-weight: 700;
+    text-transform: uppercase;
+    line-height: 1.1;
+    border: 1px solid #334155;
+    letter-spacing: 0.3px;
+}
+
+.abilities-table td {
+    border: 1px solid #d1d5db;
+    padding: clamp(1px, 0.45vh, 4.5px) 2px;
+    vertical-align: middle;
+}
+
+.stat-score-val {
+    font-size: 15pt;
+    font-weight: 800;
+    line-height: 1;
+    color: #111827;
+}
+
+.stat-sub-label {
+    font-size: 5.6pt;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: #4b5563;
+    display: block;
+    margin-top: 1.5px;
+    letter-spacing: 0.3px;
+}
+
+.stat-def-val {
+    font-size: 15pt;
+    font-weight: 800;
+    color: #111827;
+}
+
+.stat-check-val {
+    font-size: 15pt;
+    font-weight: 800;
+    color: #111827;
+}
+
+/* DAMAGE Tabelle / Box - Kompakter, harmonisch zur Ability-Box, Formel nebeneinander */
+.official-damage-box {
+    border: 2px solid #b91c1c;
+    border-radius: 4px;
+    overflow: hidden;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.damage-header-bar {
+    background: #b91c1c !important;
+    color: #ffffff !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 8.5pt;
+    font-weight: 700;
+    padding: 2.5px 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+}
+
+.damage-row {
+    background: #b91c1c !important;
+    color: #ffffff !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+    padding: 3.5px 6px;
+    border-bottom: 1.5px solid #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 4px;
+    flex: 1;
+    box-sizing: border-box;
+}
+
+.damage-row:last-child {
+    border-bottom: none;
+}
+
+.damage-type-pill {
+    font-size: 6.8pt;
+    font-weight: 800;
+    text-transform: uppercase;
+    width: 28px;
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+    text-align: center;
+    letter-spacing: 0.4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ffffff;
+    flex-shrink: 0;
+}
+
+.damage-mult-card {
+    background: #ffffff !important;
+    color: #111827 !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+    border-radius: 3px;
+    padding: 3px 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    flex: 1.25;
+    white-space: nowrap;
+    height: 80%;
+    box-sizing: border-box;
+}
+
+.damage-mult-card span.marvel-die-badge {
+    background: #b91c1c !important;
+    color: #ffffff !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 6.8pt;
+    font-weight: 800;
+    padding: 1px 3.5px;
+    border-radius: 2px;
+    letter-spacing: 0.3px;
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.damage-mult-val {
+    font-size: 11pt;
+    font-weight: 800;
+    color: #111827;
+    white-space: nowrap;
+    display: inline-block;
+    vertical-align: middle;
+    line-height: 1;
+}
+
+.damage-plus-symbol {
+    color: #ffffff;
+    font-size: 11pt;
+    font-weight: 900;
+    flex-shrink: 0;
+    width: 10px;
+    text-align: center;
+    line-height: 1;
+}
+
+.damage-score-card {
+    background: #ffffff !important;
+    color: #111827 !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+    border-radius: 3px;
+    padding: 3px 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0.85;
+    white-space: nowrap;
+    height: 80%;
+    box-sizing: border-box;
+}
+
+.damage-score-val {
+    font-size: 11pt;
+    font-weight: 800;
+    color: #111827;
+    line-height: 1;
+}
+
+/* ==========================================================================
+   SPALTE 2: PROFILE BADGES, TRAITS & TAGS, POWERS
+   ========================================================================== */
+.col-middle {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100%;
+}
+
+.profile-badges-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 5px;
+    margin-bottom: 5px;
+}
+
+.badge-card {
+    border: 2px solid #b91c1c;
+    border-radius: 4px;
+    padding: 3px 5px;
+    text-align: center;
+    background: #ffffff;
+}
+
+.badge-card-title {
+    font-size: 6.8pt;
+    font-weight: 600;
+    text-transform: uppercase;
+    color: #4b5563;
+    border-bottom: 1px solid #e5e7eb;
+    padding-bottom: 1px;
+    margin-bottom: 1px;
+    letter-spacing: 0.5px;
+}
+
+.badge-card-value {
+    font-size: 16pt;
+    font-weight: 800;
+    color: #111827;
+    line-height: 1.1;
+}
+
+.badge-card-sub {
+    font-size: 5.6pt;
+    color: #6b7280;
+    font-weight: 600;
+}
+
+/* SPEED PANEL - Jetzt groß, klar und strukturiert */
+.official-speed-panel {
+    grid-column: 1 / -1;
+    border: 2px solid #b91c1c;
+    border-radius: 4px;
+    background: #ffffff;
+    overflow: hidden;
+    margin-bottom: 2px;
+}
+
+.speed-panel-header {
+    background: #b91c1c !important;
+    color: #ffffff !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+    font-size: 6.8pt;
+    font-weight: 700;
+    letter-spacing: 0.8px;
+    padding: 1.5px 6px;
+    text-transform: uppercase;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.speed-metrics-row {
+    display: flex;
+    align-items: stretch;
+    background: #ffffff;
+}
+
+.speed-metric-item {
+    flex: 1;
+    text-align: center;
+    padding: 2.5px 2px;
+    border-right: 1px solid #f1f5f9;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.speed-metric-item:last-child {
+    border-right: none;
+}
+
+.speed-metric-label {
+    font-size: 5.4pt;
+    font-weight: 700;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    white-space: nowrap;
+}
+
+.speed-metric-val {
+    font-size: 13pt;
+    font-weight: 800;
+    color: #111827;
+    line-height: 1.1;
+}
+
+.speed-metric-item.speed-extra {
+    background: #fef2f2;
+}
+
+.speed-metric-item.speed-extra .speed-metric-label {
+    color: #b91c1c;
+}
+
+.speed-metric-item.speed-extra .speed-metric-val {
+    color: #b91c1c;
+}
+
+/* TRAITS & TAGS */
+.official-traits-tags-box {
+    border: 2px solid #b91c1c;
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 5px;
+}
+
+.traits-tags-header {
+    background: #b91c1c !important;
+    color: #ffffff !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 8pt;
+    font-weight: 700;
+    padding: 2px 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+}
+
+.traits-tags-columns {
+    display: grid;
+    grid-template-columns: 1.1fr 0.9fr;
+    gap: 8px;
+    padding: 4px 6px;
+    font-size: 7pt;
+    background: #ffffff;
+}
+
+.tt-subheading {
+    font-size: 6.8pt;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: #111827;
+    margin-bottom: 2px;
+    border-bottom: 1.5px solid #e5e7eb;
+    letter-spacing: 0.4px;
+}
+
+.tt-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.tt-list li {
+    margin-bottom: 1.5px;
+    padding-left: 8px;
+    position: relative;
+    line-height: 1.2;
+}
+
+.tt-list li::before {
+    content: "◆";
+    position: absolute;
+    left: 0;
+    font-size: 4.5pt;
+    color: #b91c1c;
+    top: 1px;
+}
+
+/* POWERS BOX */
+.official-powers-box {
+    border: 2px solid #b91c1c;
+    border-radius: 4px;
+    overflow: hidden;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.powers-header-bar {
+    background: #b91c1c !important;
+    color: #ffffff !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 8pt;
+    font-weight: 700;
+    padding: 2px 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.powers-header-meta {
+    font-size: 6.5pt;
+    font-weight: 600;
+    opacity: 0.9;
+}
+
+/* Kompakte Darstellung (Standard) - Deutlich größer und angenehm lesbar */
+.powers-grouped-content {
+    padding: 6px 8px;
+    font-size: 8.5pt;
+    background: #ffffff;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    flex: 1;
+}
+
+.power-set-group-title {
+    font-size: 8.5pt;
+    font-weight: 800;
+    text-transform: uppercase;
+    color: #b91c1c;
+    margin-bottom: 3px;
+    border-bottom: 1.5px solid #fee2e2;
+    padding-bottom: 1.5px;
+    letter-spacing: 0.5px;
+}
+
+.power-bullets-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 6px 0;
+}
+
+.power-bullets-list li {
+    font-size: 8.5pt;
+    margin-bottom: 2.5px;
+    padding-left: 10px;
+    position: relative;
+    line-height: 1.28;
+    color: #1f2937;
+    font-weight: 600;
+}
+
+.power-bullets-list li::before {
+    content: "◆";
+    position: absolute;
+    left: 0;
+    font-size: 5pt;
+    color: #b91c1c;
+    top: 1.5px;
+}
+
+/* Detaillierte Darstellung (mit Erklärungen & Effekten) */
+.powers-grouped-content.show-descriptions {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 7px;
+    padding: 5px 7px;
+    font-size: 8pt;
+}
+
+.powers-grouped-content.show-descriptions.dense-mode {
+    gap: 5px;
+    padding: 4px 6px;
+}
+
+.power-detail-item {
+    margin-bottom: 4px;
+    padding-left: 0;
+    line-height: 1.22;
+}
+
+.power-detail-item::before {
+    display: none !important;
+}
+
+.power-detail-row {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    flex-wrap: wrap;
+}
+
+.power-bullet-dot {
+    color: #b91c1c;
+    font-size: 5pt;
+}
+
+.power-name-bold {
+    font-size: 8.2pt;
+    font-weight: 800;
+    color: #111827;
+}
+
+.power-cost-tag {
+    font-size: 6.5pt;
+    background: #e0f2fe;
+    color: #0369a1;
+    font-weight: 700;
+    padding: 0.5px 3.5px;
+    border-radius: 2px;
+}
+
+.power-action-tag {
+    font-size: 6.5pt;
+    background: #f1f5f9;
+    color: #475569;
+    font-weight: 600;
+    padding: 0.5px 3.5px;
+    border-radius: 2px;
+}
+
+.power-desc-inline {
+    font-size: 7.2pt;
+    color: #374151;
+    padding-left: 10px;
+    line-height: 1.25;
+    margin-top: 1px;
+}
+
+.dense-mode .power-name-bold {
+    font-size: 7.6pt;
+}
+.dense-mode .power-desc-inline {
+    font-size: 6.8pt;
+    line-height: 1.2;
+}
+
+/* ==========================================================================
+   SPALTE 3: BIOGRAPHY, HISTORY, PERSONALITY
+   ========================================================================== */
+.col-right {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100%;
+}
+
+.official-bio-box {
+    border: 2px solid #b91c1c;
+    border-radius: 4px;
+    overflow: hidden;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.bio-header-bar {
+    background: #b91c1c !important;
+    color: #ffffff !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 8.5pt;
+    font-weight: 700;
+    padding: 2.5px 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+}
+
+.bio-content-pad {
+    padding: 6px 8px;
+    font-size: 8pt;
+    background: #ffffff;
+    line-height: 1.32;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.bio-prop-line {
+    margin-bottom: 2.5px;
+    font-size: 8pt;
+    line-height: 1.28;
+}
+
+.bio-prop-line strong {
+    color: #111827;
+}
+
+.bio-section-subhead {
+    font-size: 8.5pt;
+    font-weight: 800;
+    text-transform: uppercase;
+    color: #111827;
+    margin-top: 6px;
+    margin-bottom: 3px;
+    border-bottom: 1.5px solid #e5e7eb;
+    letter-spacing: 0.5px;
+}
+
+.bio-narrative-text {
+    font-size: 8.5pt;
+    color: #374151;
+    line-height: 1.32;
+    text-align: justify;
+    white-space: pre-line;
+}
+
+/* --------------------------------------------------------------------------
+   Echter Druck-Modus (@media print)
+   -------------------------------------------------------------------------- */
+@media print {
+    @page {
+        size: A4 portrait;
+        margin: 0;
+    }
+
+    .app-header,
+    .main-content,
+    .modal-overlay,
+    .toast-container,
+    .preview-toolbar,
+    .preview-toolbar.active,
+    #preview-toolbar,
+    .no-print {
+        display: none !important;
+        visibility: hidden !important;
+        height: 0 !important;
+        width: 0 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        border: none !important;
+    }
+
+    #print-sheet,
+    #print-sheet.preview-mode {
+        display: flex !important;
+        flex-direction: column !important;
+        background: #ffffff !important;
+        color: #111827 !important;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        font-size: 8.5pt;
+        line-height: 1.25;
+        width: 210mm !important;
+        height: 297mm !important;
+        max-width: 210mm !important;
+        max-height: 297mm !important;
+        margin: 0 auto !important;
+        padding: 6mm 8mm !important;
+        box-shadow: none !important;
+        border: none !important;
+        border-radius: 0 !important;
+        box-sizing: border-box !important;
+        overflow: hidden !important;
+        page-break-after: avoid !important;
+        page-break-inside: avoid !important;
+    }
+
+    body {
+        background: #ffffff !important;
+        color: #000000 !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        width: 210mm !important;
+        height: 297mm !important;
+    }
+}
