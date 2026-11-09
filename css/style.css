@@ -337,6 +337,11 @@
     padding: 0;
 }
 
+html, body {
+    max-width: 100%;
+    overflow-x: hidden;
+}
+
 body {
     background-color: var(--bg-main);
     color: var(--text-main);
@@ -1996,3 +2001,406 @@ body.rules-disabled .rule-helper-note {
 }
 
 
+
+/* ==========================================================================
+   Mobile & Responsive Optimierungen (Smartphones & Tablets)
+   Lässt die Desktop-Ansicht 100% unberührt, optimiert für Handys & kleine Screens
+   ========================================================================== */
+
+/* 1. Sheet Preview Wrapper für saubere Zentrierung & horizontales Scrollen */
+.sheet-preview-wrapper {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    box-sizing: border-box;
+}
+
+@media (max-width: 850px) {
+    /* Horizontales Wischen für den A4-Druckbogen auf Tablets & Smartphones */
+    .sheet-preview-wrapper {
+        display: block;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        padding: 8px 4px 35px 4px;
+    }
+
+    /* Bogen-Vorschau Toolbar mobil */
+    .preview-toolbar {
+        width: 100% !important;
+        max-width: 100% !important;
+        padding: 10px 8px !important;
+        flex-direction: column !important;
+        align-items: stretch !important;
+        gap: 8px !important;
+        box-sizing: border-box !important;
+    }
+
+    .preview-toolbar-divider {
+        display: none !important;
+    }
+
+    .preview-toolbar-group {
+        width: 100%;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 6px;
+    }
+
+    .preview-dimension-control {
+        font-size: 0.76rem;
+        gap: 4px;
+    }
+
+    .dimension-slider {
+        width: 65px;
+    }
+
+    .dimension-input {
+        width: 44px;
+    }
+}
+
+@media (max-width: 768px) {
+    /* Tipps & Hilfetexte: Niemals Text auf kleineren Bildschirmen abschneiden */
+    .rule-helper-note {
+        max-height: none !important;
+        padding: 10px 12px;
+    }
+}
+
+@media (max-width: 680px) {
+    /* Header-Struktur auf Mobilgeräten */
+    .header-container {
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: stretch !important;
+        gap: 8px !important;
+        padding: 8px 10px !important;
+    }
+
+    .logo-group {
+        grid-area: unset !important;
+        display: flex !important;
+        justify-content: center !important;
+        align-items: center !important;
+        width: 100% !important;
+        gap: 8px !important;
+    }
+
+    .app-title {
+        font-size: 1.05rem !important;
+        letter-spacing: 0.3px !important;
+        text-align: center !important;
+    }
+
+    .app-badge {
+        font-size: 0.74rem !important;
+        padding: 2px 6px !important;
+    }
+
+    .nav-tabs {
+        grid-area: unset !important;
+        display: flex !important;
+        width: 100% !important;
+        margin: 0 !important;
+        gap: 4px !important;
+        background-color: #0b0f19 !important;
+        border: 1px solid var(--border-color) !important;
+        border-radius: var(--radius-sm) !important;
+        padding: 3px !important;
+        box-sizing: border-box !important;
+    }
+
+    [data-theme="light"] .nav-tabs {
+        background-color: #e2e8f0 !important;
+        border-color: #cbd5e1 !important;
+    }
+
+    .nav-tab-btn {
+        flex: 1 !important;
+        text-align: center !important;
+        justify-content: center !important;
+        padding: 8px 6px !important;
+        font-size: 0.84rem !important;
+        border-radius: 4px !important;
+        white-space: nowrap !important;
+    }
+
+    .header-actions {
+        grid-area: unset !important;
+        width: 100% !important;
+        justify-content: center !important;
+        gap: 5px !important;
+        flex-wrap: wrap !important;
+    }
+
+    .header-btn-group {
+        width: 100% !important;
+        justify-content: center !important;
+        flex-wrap: wrap !important;
+        gap: 5px !important;
+    }
+
+    .header-select {
+        flex: 1 1 140px !important;
+        min-width: 130px !important;
+        max-width: 100% !important;
+        height: 36px !important;
+    }
+
+    .header-rule-toggle {
+        font-size: 0.78rem !important;
+        padding: 0 8px !important;
+        height: 36px !important;
+    }
+
+    .header-divider {
+        display: none !important;
+    }
+}
+
+@media (max-width: 640px) {
+    /* Hauptcontainer */
+    .main-content {
+        padding: 0 10px !important;
+        margin: 12px auto !important;
+    }
+
+    /* Sektionen */
+    .section-card {
+        padding: 14px 10px !important;
+        margin-bottom: 14px !important;
+        border-radius: var(--radius-sm) !important;
+    }
+
+    /* Sektions-Kopfzeilen mit Buttons (+ Kraft, Kompendium) */
+    .section-header {
+        flex-wrap: wrap !important;
+        gap: 8px !important;
+    }
+
+    .section-title {
+        font-size: 0.98rem !important;
+    }
+
+    .section-header-actions {
+        width: 100% !important;
+        margin-left: 0 !important;
+        justify-content: stretch !important;
+        gap: 6px !important;
+    }
+
+    .section-header-actions .btn {
+        flex: 1 !important;
+        min-height: 36px !important;
+        padding: 6px 8px !important;
+        font-size: 0.78rem !important;
+        text-align: center !important;
+        justify-content: center !important;
+    }
+
+    /* Identität & Profil */
+    .identity-grid {
+        grid-template-columns: 1fr !important;
+        gap: 10px !important;
+    }
+
+    #char-history, #char-personality {
+        min-height: 150px !important;
+    }
+
+    /* Kräfte-Einträge */
+    .power-item {
+        grid-template-columns: 1fr !important;
+        gap: 8px !important;
+        padding: 10px !important;
+    }
+
+    .power-item .form-group {
+        margin-bottom: 0 !important;
+    }
+
+    /* Traits-Einträge */
+    .trait-item {
+        flex-direction: column !important;
+        gap: 8px !important;
+        padding: 10px !important;
+    }
+
+    .trait-item > div:first-child {
+        width: 100% !important;
+    }
+
+    .trait-item > div:last-child {
+        width: 100% !important;
+        flex-direction: row !important;
+        justify-content: flex-end !important;
+        gap: 6px !important;
+    }
+
+    /* Modals & Dialoge */
+    .modal-card {
+        width: 95% !important;
+        max-width: 100% !important;
+        padding: 16px 12px !important;
+        max-height: 90vh !important;
+        overflow-y: auto !important;
+    }
+
+    .compendium-search-bar {
+        flex-direction: column !important;
+        gap: 8px !important;
+    }
+
+    .compendium-search-bar input,
+    .compendium-search-bar select {
+        width: 100% !important;
+    }
+
+    .compendium-item-card {
+        flex-direction: column !important;
+        gap: 8px !important;
+        padding: 10px !important;
+    }
+
+    .compendium-item-card .btn {
+        width: 100% !important;
+        justify-content: center !important;
+        min-height: 36px !important;
+    }
+
+    /* Sprachauswahl-Raster */
+    .lang-welcome-grid {
+        grid-template-columns: 1fr 1fr !important;
+        gap: 8px !important;
+    }
+
+    /* Toasts */
+    .toast-container {
+        left: 10px !important;
+        right: 10px !important;
+        bottom: 12px !important;
+        width: calc(100% - 20px) !important;
+    }
+
+    .toast {
+        width: 100% !important;
+        font-size: 0.82rem !important;
+        padding: 8px 12px !important;
+    }
+
+    /* Fußzeile */
+    .app-footer {
+        padding: 16px 10px !important;
+        margin-top: 24px !important;
+        font-size: 0.74rem !important;
+    }
+}
+
+@media (max-width: 480px) {
+    /* Header-Titel & Buttons auf kleinen Smartphones */
+    .app-title {
+        font-size: 0.95rem !important;
+    }
+
+    .app-badge {
+        font-size: 0.7rem !important;
+        padding: 2px 5px !important;
+    }
+
+    /* Stat Bar (Rang, Karma, Gesundheit, Fokus, Initiative) in 2 sauberen Spalten */
+    .profile-stat-bar {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 8px !important;
+    }
+
+    .stat-metric-card {
+        padding: 9px 7px !important;
+    }
+
+    .stat-metric-value {
+        font-size: 1.3rem !important;
+    }
+
+    .stat-metric-label {
+        font-size: 0.68rem !important;
+    }
+
+    /* 5. Karte (Initiative) nimmt die volle Zeile ein */
+    .profile-stat-bar > div:last-child {
+        grid-column: span 2 !important;
+    }
+
+    /* Attribute-Raster (Melee, Agility etc.) */
+    .abilities-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 8px !important;
+    }
+
+    .ability-card {
+        padding: 8px 6px !important;
+    }
+
+    .ability-letter {
+        font-size: 1.45rem !important;
+    }
+
+    .ability-name {
+        font-size: 0.78rem !important;
+    }
+
+    .ability-score-input {
+        width: 52px !important;
+        height: 38px !important;
+        font-size: 1.25rem !important;
+    }
+
+    .ability-meta-box {
+        padding: 4px !important;
+        font-size: 0.68rem !important;
+    }
+
+    .ability-bonus-input {
+        width: 36px !important;
+        font-size: 0.74rem !important;
+    }
+
+    /* Schadensmultiplikatoren */
+    .damage-cards-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 8px !important;
+    }
+
+    .damage-card {
+        padding: 8px 6px !important;
+    }
+
+    .damage-card-type {
+        font-size: 0.92rem !important;
+    }
+
+    .damage-formula-pill {
+        font-size: 0.8rem !important;
+        padding: 4px !important;
+    }
+
+    .damage-bonus-row {
+        font-size: 0.7rem !important;
+    }
+
+    /* Fortbewegung */
+    .speed-inputs-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 8px !important;
+    }
+
+    .extra-speed-item {
+        flex-wrap: wrap !important;
+        gap: 6px !important;
+        padding: 6px 8px !important;
+    }
+
+    .extra-speed-item input[type="text"] {
+        flex: 1 1 100% !important;
+    }
+}

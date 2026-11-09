@@ -685,8 +685,11 @@
         </div>
     </div>
 
-    <div id="print-sheet">
-        <!-- Wird dynamisch durch app.js exakt wie die Core Rulebook Seite formatiert -->
+    <!-- Sheet Preview Container (Ermöglicht sauberes horizontales Wischen auf Mobilgeräten ohne Seiten-Überlauf) -->
+    <div id="sheet-preview-wrapper" class="sheet-preview-wrapper">
+        <div id="print-sheet">
+            <!-- Wird dynamisch durch app.js exakt wie die Core Rulebook Seite formatiert -->
+        </div>
     </div>
 
     <!-- =======================================================================
@@ -787,14 +790,14 @@
         <div class="modal-card" style="max-width: 480px; width: 92%; text-align: center;">
             <div class="modal-header" style="justify-content: center; position: relative;">
                 <h3 style="font-size: 1.18rem; font-weight: 800; color: #ffffff;" data-i18n="welcome_lang_title">
-                    🌐 Choose Language
+                    🌐 Sprache wählen / Choose Language
                 </h3>
                 <button id="btn-close-lang-modal" class="modal-close" style="position: absolute; right: 16px;">&times;</button>
             </div>
             
             <div style="padding: 16px 12px 10px;">
                 <p style="color: var(--text-dim); margin-bottom: 20px; font-size: 0.92rem; line-height: 1.45;" data-i18n="welcome_lang_desc">
-                    Choose your preferred language for the editor, rules, and sheet preview.
+                    Wähle deine bevorzugte Sprache für den Editor, die Regeln und die Bogen-Vorschau.
                 </p>
                 <div class="lang-welcome-grid">
                     <button type="button" class="btn-lang-choice" data-lang="en">

@@ -28,6 +28,7 @@
     border: 1px solid #d1d5db;
     box-sizing: border-box;
     overflow: hidden;
+    flex-shrink: 0;
 }
 
 /* --------------------------------------------------------------------------
@@ -805,6 +806,15 @@
         width: 0 !important;
         margin: 0 !important;
         padding: 0 !important;
+        border: none !important;
+    }
+
+    .sheet-preview-wrapper {
+        display: block !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        overflow: visible !important;
+        width: 100% !important;
         border: none !important;
     }
 

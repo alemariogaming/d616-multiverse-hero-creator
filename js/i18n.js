@@ -121,7 +121,7 @@ const MMRPG_I18N = {
             btn_delete_hero_item_title: "Diesen Helden löschen",
             opt_pick_preset: "Vorgaben",
             footer_contact: "✉️ Kontakt:",
-            welcome_lang_title: "🌐 Sprache wählen",
+            welcome_lang_title: "🌐 Sprache wählen / Choose Language",
             welcome_lang_desc: "Wähle deine bevorzugte Sprache für den Editor, die Regeln und die Bogen-Vorschau.",
             btn_open_lang_selector: "Sprachauswahl öffnen",
 
@@ -396,7 +396,7 @@ const MMRPG_I18N = {
             btn_delete_hero_item_title: "Delete this hero",
             opt_pick_preset: "Presets",
             footer_contact: "✉️ Contact:",
-            welcome_lang_title: "🌐 Choose Language",
+            welcome_lang_title: "🌐 Choose Language / Sprache wählen",
             welcome_lang_desc: "Choose your preferred language for the editor, rules, and sheet preview.",
             btn_open_lang_selector: "Open language picker",
 
